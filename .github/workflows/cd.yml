@@ -1,0 +1,42 @@
+name: CD
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    name: Deploy
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Install stable toolchain and run cargo test
+        uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: stable
+          override: true
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v2
+
+      - uses: actions/setup-ruby@v1
+        with:
+          ruby-version: "2.7"
+
+      - uses: actions/cache@v2
+        with:
+          path: |
+            ~/.cargo/bin
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+
+      - run: cargo install sqlx-cli --version 0.5.2 --no-default-features --features postgres || true
+      - run: cd backend && sqlx --database-url ${{secrets.DATABASE_URL}} migrate run
+
+      - run: cd frontend && npm install && npm run build
+      - run: cp -r frontend/dist backend/
+
+      - run: gem install dpl --pre
+      - run: dpl heroku api --app=nebula0 --api-key=${{secrets.HEROKU_API_KEY}}

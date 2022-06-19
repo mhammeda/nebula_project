@@ -1,0 +1,90 @@
+name: CI
+on:
+  push:
+    branches:
+      - "*"
+      - "!main"
+
+jobs:
+  stylecheck:
+    name: Stylecheck
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v2
+
+      - name: Install stable toolchain with rustfmt and run cargo format in check mode
+        uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: stable
+          components: rustfmt
+          override: true
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v2
+
+      - run: cd backend && cargo fmt --all -- --check
+      - run: cd frontend && npm install && npm run lint
+
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:13-alpine
+        ports:
+          - 5432:5432
+        env:
+          POSTGRES_DB: nebula
+          POSTGRES_USER: runner
+          POSTGRES_PASSWORD: ""
+          POSTGRES_HOST_AUTH_METHOD: trust
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    env:
+      RUSTFLAGS: -D warnings
+      FQDN: "example.org"
+      DATABASE_URL: "postgres://runner@localhost:5432/nebula"
+      RUST_LOG: debug
+      WEB_ADDR: "127.0.0.1:8080"
+      DIST_PATH: "../frontend/dist"
+      SECRET: "MPJ0HkSeiy2HCQS1Y9I4VzMbIDxrV2wupYCd1/eGUts893zEK6tQeRMR4qNPXX7+pJWXnPBW4ixN9nzWZPNH2w=="
+      PRIVKEY: "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"
+
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v2
+
+      - name: Install stable toolchain and run cargo test
+        uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: stable
+          override: true
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v2
+
+      - uses: actions/cache@v2
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            ~/.cargo/bin
+            backend/target
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+            ${{ runner.os }}-cargo-
+
+      - run: cd frontend && npm install && npm run build
+      - run: cp -r frontend/dist backend/
+      - run: cargo install sqlx-cli --version 0.5.2 --no-default-features --features postgres || true
+      - run: cd backend && sqlx database reset
+      - run: cd backend && cargo test --release --all-features --no-fail-fast --all

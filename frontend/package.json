@@ -1,0 +1,61 @@
+{
+  "name": "frontend",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "serve": "vue-cli-service serve",
+    "build": "vue-cli-service build",
+    "lint": "vue-cli-service lint"
+  },
+  "dependencies": {
+    "@types/vue-markdown": "^2.2.1",
+    "axios": "^0.21.1",
+    "babel-runtime": "^6.26.0",
+    "core-js": "^3.8.2",
+    "vue": "^2.6.12",
+    "vue-axios": "^3.2.2",
+    "vue-class-component": "^7.2.6",
+    "vue-cookies": "^1.7.4",
+    "vue-markdown": "^2.2.4",
+    "vue-material-design-icons": "^4.11.0",
+    "vue-password-strength-meter": "^1.7.2",
+    "vue-property-decorator": "^9.1.2",
+    "vue-router": "^3.4.9",
+    "vue3-markdown-it": "^1.0.7",
+    "vuetify": "^2.4.2",
+    "zxcvbn": "^4.4.2"
+  },
+  "devDependencies": {
+    "@mdi/font": "^5.9.55",
+    "@typescript-eslint/eslint-plugin": "^2.33.0",
+    "@typescript-eslint/parser": "^2.33.0",
+    "@vue/cli-plugin-babel": "~4.5.0",
+    "@vue/cli-plugin-eslint": "~4.5.0",
+    "@vue/cli-plugin-router": "~4.5.0",
+    "@vue/cli-plugin-typescript": "~4.5.0",
+    "@vue/cli-service": "~4.5.0",
+    "@vue/eslint-config-typescript": "^5.0.2",
+    "eslint": "^6.7.2",
+    "eslint-plugin-vue": "^6.2.2",
+    "lint-staged": "^9.5.0",
+    "sass": "^1.26.5",
+    "sass-loader": "^8.0.2",
+    "typescript": "~3.9.3",
+    "vue-template-compiler": "^2.6.11"
+  },
+  "gitHooks": {
+    "pre-commit": "lint-staged"
+  },
+  "lint-staged": {
+    "*.{js,jsx,vue,ts,tsx}": [
+      "vue-cli-service lint",
+      "git add"
+    ]
+  },
+  "prettier": {
+    "trailingComma": "es5",
+    "tabWidth": 4,
+    "semi": false,
+    "singleQuote": true
+  }
+}
